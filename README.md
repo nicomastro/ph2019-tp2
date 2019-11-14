@@ -1,6 +1,7 @@
 # ph2019-tp2
 
-#Dominio del TP:
+## Dominio del TP:
+
 Para el TP pensamos hacer un sistema al cual le podemos dar una instrucción para que reproduzca una canción dada por nombre o que reproduzca alguna dada por grupo/cantante.
 La idea sería tener una especie de base de datos con nombre de canción y grupo/cantante.
 
