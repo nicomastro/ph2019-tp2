@@ -11,9 +11,9 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 import json
 
 # Síntesis
-tts_authenticator = IAMAuthenticator('**ACÁ VA LA API KEY DE TTS**')
+tts_authenticator = IAMAuthenticator('16brHHpIvclEZodkhLMGcoq4FKN7_dTh601Gh9HauYRH')
 tts = TextToSpeechV1(authenticator=tts_authenticator)
-tts.set_service_url('**ACÁ VA LA URL DE TTS**')
+tts.set_service_url('https://stream.watsonplatform.net/text-to-speech/api')
 
 with open('hello_world.wav', 'wb') as audio_file:
     audio_file.write(
@@ -24,9 +24,9 @@ with open('hello_world.wav', 'wb') as audio_file:
         ).get_result().content)
 
 # Reconocimiento
-stt_authenticator = IAMAuthenticator('**ACÁ VA LA API KEY DE STT**')
+stt_authenticator = IAMAuthenticator('bXmuzE7OGUPlDTgQfqt_0RlmlfwcZSmVbpsGi8_7KEQ0')
 stt = SpeechToTextV1(authenticator=stt_authenticator)
-stt.set_service_url('**ACÁ VA LA URL DE STT**')
+stt.set_service_url('https://stream.watsonplatform.net/speech-to-text/api')
 
 with open('hello_world.wav', 'rb') as audio_file:
     print(json.dumps(stt.recognize(audio=audio_file,
