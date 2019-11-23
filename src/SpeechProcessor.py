@@ -33,10 +33,9 @@ class SpeechProcessor:
 
     def reconocer(self, inFileName='audio.wav'):
         # Reconocimiento
-        print(self.data_path)
         self.ps.decode(
             audio_file=os.path.join(self.data_path,inFileName),
-            buffer_size=2048,
+            buffer_size=512,
             no_search=False,
             full_utt=False
         )
