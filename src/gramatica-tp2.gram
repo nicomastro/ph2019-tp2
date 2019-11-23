@@ -1,0 +1,14 @@
+#JSGF V1.0;
+grammar tp2;
+
+public <grammar> = <comando> <item> <nombres>;
+
+<comando> = (<reproduccion> | <control>);
+<reproduccion> = (reproducir | detener <NULL> | poner | pausar <NULL>);
+<control> = (aumentar volumen | bajar volumen | listar );
+
+<item> = (canción de | algo de | <nombres> );
+<nombres> =  (<banda> | <cancion>);
+<cancion> = (el revelde | la bestia pop);
+<banda> = (la renga | los redondos);
+
