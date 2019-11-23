@@ -12,20 +12,13 @@ class SpeechProcessor:
             'lm': lm,
             'dict': dict,
         }
-    	#model_path = get_model_path()
-    	#config = {
-    	#    'hmm': os.path.join(model_path, 'en-us'),
-    	#    'lm': os.path.join(model_path, 'en-us.lm.bin'),
-    	#    'dict': os.path.join(model_path, 'cmudict-en-us.dict')
-    	#}
-
         self.ps = Pocketsphinx(**config)
         # Switch to JSGF grammar
-        jsgf = Jsgf('data/etc/gramatica-hola-mundo.gram')
-        rule = jsgf.get_rule('hola_mundo.grammar')
+        jsgf = Jsgf('data/etc/gramatica-tp2.gram')
+        rule = jsgf.get_rule('tp2.grammar')
         fsg = jsgf.build_fsg(rule, self.ps.get_logmath(), 7.5)
-        self.ps.set_fsg('hola_mundo', fsg)
-        self.ps.set_search('hola_mundo')
+        self.ps.set_fsg('tp2', fsg)
+        self.ps.set_search('tp2')
 
 
     def sintetizar(self, outFileName, msg):
