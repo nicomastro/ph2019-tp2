@@ -1,0 +1,9 @@
+#JSGF V1.0;
+
+grammar hola_mundo;
+
+public <grammar> = <saludo> <destinatario>;
+
+<saludo> = (hola | buen día | buenos días);
+<destinatario> = (mundo | argentina | universidad);
+

@@ -22,14 +22,13 @@ class Recorder(object):
     Records in mono by default.
     '''
 
-    def __init__(self, channels=1, rate=44100, frames_per_buffer=1024):
+    def __init__(self, channels=1, rate=44100, frames_per_buffer=512):
         self.channels = channels
         self.rate = rate
         self.frames_per_buffer = frames_per_buffer
 
     def open(self, fname, mode='wb'):
-        return RecordingFile(fname, mode, self.channels, self.rate,
-                            self.frames_per_buffer)
+        return RecordingFile(fname, mode, self.channels, self.rate,self.frames_per_buffer)
 
 class RecordingFile(object):
     def __init__(self, fname, mode, channels, 
@@ -57,7 +56,7 @@ class RecordingFile(object):
                                         input=True,
                                         frames_per_buffer=self.frames_per_buffer)
         for _ in range(int(self.rate / self.frames_per_buffer * duration)):
-            audio = self._stream.read(self.frames_per_buffer)
+            audio = self._stream.read(self.frames_per_buffer, exception_on_overflow = False)
             self.wavefile.writeframes(audio)
         return None
 
@@ -95,3 +94,6 @@ class RecordingFile(object):
         wavefile.setframerate(self.rate)
         return wavefile
 
+rec = Recorder(channels=1)
+#with rec.open('blocking.wav', 'wb') as recfile:
+#    recfile.record(duration=3.0)
