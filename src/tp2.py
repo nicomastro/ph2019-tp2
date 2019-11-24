@@ -10,7 +10,7 @@ grabando = False
 numwav = 0
 
 def procesar():
-  res = sp.reconocer('audio.wav')
+  res = sp.reconocer('test.wav')
   print(res)
 
 def on_click(x, y, button, pressed):
