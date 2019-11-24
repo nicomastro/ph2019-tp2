@@ -71,11 +71,11 @@ def play_wav(wav_filename, chunk_size=1024):
     # Close PyAudio.
     p.terminate()
 
-    estado = Estados.Escuchando
+    #estado = Estados.Escuchando
 
 def resToString(res):
   if len(res) > 0:
-    ret = [t[0] for t in res]
+    ret = [str(t[0])+ "," for t in res]
     return ''.join(ret)
   else:
     return ''
