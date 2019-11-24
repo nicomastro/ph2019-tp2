@@ -12,7 +12,15 @@ class SpeechProcessor:
             'lm': lm,
             'dict': dict,
         }
+    	#model_path = get_model_path()
+    	#config = {
+    	#    'hmm': os.path.join(model_path, 'en-us'),
+    	#    'lm': os.path.join(model_path, 'en-us.lm.bin'),
+    	#    'dict': os.path.join(model_path, 'cmudict-en-us.dict')
+    	#}
+
         self.ps = Pocketsphinx(**config)
+        
         # Switch to JSGF grammar
         jsgf = Jsgf('data/etc/gramatica-tp2.gram')
         rule = jsgf.get_rule('tp2.grammar')
@@ -26,13 +34,13 @@ class SpeechProcessor:
 
     def reconocer(self, inFileName='audio.wav'):
         # Reconocimiento
+        print(self.data_path)
         self.ps.decode(
             audio_file=os.path.join(self.data_path,inFileName),
-            buffer_size=512,
+            buffer_size=2048,
             no_search=False,
             full_utt=False
         )
-
-        return self.ps.best(count=3)
+        return self.ps.segments(), self.ps.best(count=3)
             
 
