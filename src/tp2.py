@@ -10,6 +10,7 @@ import re
 import pyaudio
 import wave
 import sys
+from multiprocessing import Process
 from enum import Enum
 from sox import core
 from sox.core import SoxiError
@@ -20,6 +21,7 @@ recfile = None
 grabando = False
 numwav = 0
 pid = -1
+process=None
 
 class Estados(Enum):
   Escuchando = 0
@@ -71,7 +73,7 @@ def play_wav(wav_filename, chunk_size=1024):
     # Close PyAudio.
     p.terminate()
 
-    #estado = Estados.Escuchando
+    estado = Estados.Escuchando
 
 def resToString(res):
   if len(res) > 0:
@@ -80,9 +82,9 @@ def resToString(res):
   else:
     return ''
 
-def procesar():
-  global pid, estado, Estados
-  cmd, res = sp.reconocer('audio_final.wav')
+def procesar(audioName = 'audio_final.wav'):
+  global pid, estado, Estados, process
+  cmd, res = sp.reconocer(audioName)
   #str1 = ''.join(res)
 
   print(cmd)
@@ -90,40 +92,61 @@ def procesar():
   str1 = resToString(res)
   print(str1)
   msg = ""
+  song=""
   
   if (re.search("poner|reproducir|poné", str1)):
     encontro = True
     if re.search("algo de|canción de",str1):
-      if re.search("la renga|los redondos|queen",str1):
+      if re.search("la renga|los redondos|épica|queen",str1):
         print("Reproduciendo...")
         msg = "Reproduciendo"
+        if re.search("la renga",str1):
+            msg = msg + " la renga"
+        elif re.search("los redondos",str1):
+            msg = msg + " los redondos"
+        elif re.search("épica",str1):
+            msg = msg + " épica"
+        else:
+            msg = msg + " cuin"
         estado = Estados.Reproduciendo
       else:
         encontro = False
-    elif re.search("la bestia pop|el revelde",str1):
+    elif re.search("la bestia pop|el revelde | you give love a bad name",str1):
       print("Reproduciendo...")
       msg = "Reproduciendo"
+      if re.search("la bestia pop",str1):
+        msg = msg + " la bestia pop"
+      elif re.search("you give love a bad name",str1):
+        msg = msg + " iu guiv lov e bad neim"
+        song="You_give_love_a_bad_name.mp3"
+      else:
+        msg = msg + " el revelde"
       estado = Estados.Reproduciendo
     else:
       encontro = False
     if encontro == True:
-      pid = os.fork()
-      if(pid == 0):
-        print("Encontró:")
-        msg = "Reproduciendo"
+      #pid = os.fork()
+      #if(pid == 0):
+      if process != None:
+        process.terminate()
+        process.close()
+      process = Process(target=play_wav, args=('canciones/'+song))
+      process.start()
+      print("Encontró:")
+      #msg = "Reproduciendo"
         #play_wav('data/songs/el_revelde.wav')
-        os._exit(os.EX_OK)
-      else:
-        print(pid)
+        #os._exit(os.EX_OK)
+      #else:
+      #  print(pid)
     else:
       print("No Encontró:")
-      msg = "No Encontró"
+      msg = "No se encontró lo buscado"
   elif re.search("detener|pausar", str1):
     if estado == Estados.Reproduciendo:
       print("Pausando...")
       msg = "Pausando"
       estado = Estados.Pausado
-      os.kill(pid, signal.SIGSTOP)
+      #os.kill(pid, signal.SIGSTOP)
     else:
       print("No se puede pausar porque no está reproduciendo...")
       msg = "No se puede pausar porque no está reproduciendo"
@@ -132,7 +155,7 @@ def procesar():
       print("Reanudando...")
       msg = "Reanudando"
       estado = Estados.Reproduciendo
-      os.kill(pid, signal.SIGCONT)
+      #os.kill(pid, signal.SIGCONT)
     else:
       print("No se puede reanudar porque no está pausado...")
       msg = "No se puede reanudar porque no está pausado"
@@ -141,6 +164,11 @@ def procesar():
     msg = "No reconoce comando"
 
   sp.sintetizar('tmp/salida.wav',msg)
+  #if process != None:
+  #  process.terminate()
+  #  process.close()
+  #process = Process(target=play_wav, args=('tmp/salida.wav'))
+  #process.start()
   play_wav('tmp/salida.wav')
   return
 
@@ -151,7 +179,7 @@ def on_click(x, y, button, pressed):
   if pressed and button==mouse.Button.left:
     if not grabando:
       print('Empieza grabacion')
-      recfile = recorder.Recorder(channels=1).open('tmp/audio.wav', 'wb')
+      recfile = recorder.Recorder(channels=1, rate=16000).open('tmp/audio.wav', 'wb')
       grabando = True
       recfile.start_recording()
       #numwav += 1
@@ -163,19 +191,20 @@ def on_click(x, y, button, pressed):
       recfile.stop_recording()
       recfile.close()
     # create transformer
-      tfm = sox.Transformer()
-      tfm.convert(samplerate=16000, n_channels=1,bitdepth=16)
-      tfm.build('tmp/audio.wav', 'tmp/audio_final.wav')
+      #tfm = sox.Transformer()
+      #tfm.convert(samplerate=16000, n_channels=1,bitdepth=16)
+      #tfm.build('tmp/audio.wav', 'tmp/audio_final.wav')
       recfile = None
       grabando = False
-      procesar()
+      procesar('audio.wav')
       #os.remove('tmp/audio.wav')
+      #os.remove('tmp/audio_final.wav')
 
   # Presionar el botón derecho para terminar.
-  #if pressed and button==mouse.Button.right:
-  #  if not grabando:
-  #    return False
-      return
+  if pressed and button==mouse.Button.right:
+    if not grabando:
+      return False
+      #return
 
 
 print("Presionar el botón izquierdo para empezar a grabar.")
