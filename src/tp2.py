@@ -1,4 +1,5 @@
 # https://pypi.python.org/pypi/pynput
+import psutil
 from pynput import mouse
 import recorder
 import signal, os
@@ -22,6 +23,8 @@ grabando = False
 numwav = 0
 pid = -1
 process=None
+proc=None
+
 
 class Estados(Enum):
   Escuchando = 0
@@ -73,7 +76,7 @@ def play_wav(wav_filename, chunk_size=1024):
     # Close PyAudio.
     p.terminate()
 
-    estado = Estados.Escuchando
+    #estado = Estados.Escuchando
 
 def resToString(res):
   if len(res) > 0:
@@ -83,7 +86,7 @@ def resToString(res):
     return ''
 
 def procesar(audioName = 'audio_final.wav'):
-  global pid, estado, Estados, process
+  global pid, estado, Estados, process, proc
   cmd, res = sp.reconocer(audioName)
   #str1 = ''.join(res)
 
@@ -96,42 +99,48 @@ def procesar(audioName = 'audio_final.wav'):
   
   if (re.search("poner|reproducir|poné", str1)):
     encontro = True
+    msg="Reproduciendo"
     if re.search("algo de|canción de",str1):
+      msg=msg + " algo de"
       if re.search("la renga|los redondos|épica|queen",str1):
         print("Reproduciendo...")
-        msg = "Reproduciendo"
         if re.search("la renga",str1):
             msg = msg + " la renga"
         elif re.search("los redondos",str1):
             msg = msg + " los redondos"
         elif re.search("épica",str1):
             msg = msg + " épica"
+            song="Cry_for_the_Moon.wav"
         else:
             msg = msg + " cuin"
+            song="Under_Pressure.wav"
         estado = Estados.Reproduciendo
       else:
         encontro = False
     elif re.search("la bestia pop|el revelde | you give love a bad name",str1):
       print("Reproduciendo...")
-      msg = "Reproduciendo"
       if re.search("la bestia pop",str1):
         msg = msg + " la bestia pop"
       elif re.search("you give love a bad name",str1):
         msg = msg + " iu guiv lov e bad neim"
-        song="You_give_love_a_bad_name.mp3"
+        song="You_give_love_a_bad_name.wav"
       else:
         msg = msg + " el revelde"
       estado = Estados.Reproduciendo
     else:
       encontro = False
+
     if encontro == True:
       #pid = os.fork()
       #if(pid == 0):
       if process != None:
         process.terminate()
-        process.close()
-      process = Process(target=play_wav, args=('canciones/'+song))
+        #process.close()
+      process = Process(target=play_wav, args=('canciones/'+song, 1024))
       process.start()
+      pid = process.pid
+      proc = psutil.Process(pid)
+
       print("Encontró:")
       #msg = "Reproduciendo"
         #play_wav('data/songs/el_revelde.wav')
@@ -146,6 +155,8 @@ def procesar(audioName = 'audio_final.wav'):
       print("Pausando...")
       msg = "Pausando"
       estado = Estados.Pausado
+      if process != None:
+        proc.suspend()
       #os.kill(pid, signal.SIGSTOP)
     else:
       print("No se puede pausar porque no está reproduciendo...")
@@ -155,6 +166,8 @@ def procesar(audioName = 'audio_final.wav'):
       print("Reanudando...")
       msg = "Reanudando"
       estado = Estados.Reproduciendo
+      if process != None:
+        proc.resume()
       #os.kill(pid, signal.SIGCONT)
     else:
       print("No se puede reanudar porque no está pausado...")
@@ -207,11 +220,14 @@ def on_click(x, y, button, pressed):
       #return
 
 
-print("Presionar el botón izquierdo para empezar a grabar.")
-print("Soltar el botón izquierdo para dejar de grabar.")
-print("Presionar el botón derecho para terminar.")
+def main():
+    print("Presionar el botón izquierdo para empezar a grabar.")
+    print("Soltar el botón izquierdo para dejar de grabar.")
+    print("Presionar el botón derecho para terminar.")
+    
+    with mouse.Listener(on_click=on_click) as listener:
+        listener.join()
 
-
-with mouse.Listener(on_click=on_click) as listener:
-  listener.join()
+if __name__== '__main__':
+    main()
 
