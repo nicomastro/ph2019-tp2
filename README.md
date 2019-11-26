@@ -1,5 +1,8 @@
 # ph2019-tp2
 
+Escribo acá lo que pasaríamos luego al informe en pdf. Me gustó este template de latex :D
+
+https://es.overleaf.com/project/5ddcce4d05f3eb0001935577
 ## Dominio del TP:
 
 El reconocedor de habla que implementamos está pensado con la intención de ser un "asistente" especializado en la reproducción y control de una biblioteca de archivos de audios, como canciones. 
