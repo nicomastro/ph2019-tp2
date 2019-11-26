@@ -3,7 +3,8 @@ import psutil
 from pynput import mouse
 import recorder
 import signal, os
-import sox   
+import sox
+import pandas as pd
 #import simpleaudio as sa
 #from playsound import playsound
 #import simpleaudio.functionchecks as fc
@@ -99,13 +100,13 @@ def listar(band_filter=None):
     df = df[df['artist'] == band_filter] 
     msg+= "de " + band_filter 
   msg +=  " ... \n" + df.to_string(index=False,index_names=False,header=False,columns=['song'])
-  sp.sintetizar('tmp/salida.wav',msg)
-  resample(48000,'tmp/salida')  
-  play_wav('tmp/salida_final.wav')
-
+  #sp.sintetizar('tmp/salida.wav',msg)
+  #resample(48000,'tmp/salida')  
+  #play_wav('tmp/salida_final.wav')
+  
   print(msg)
 
-  return
+  return msg
 
 def procesar(audioName = 'audio_final.wav'):
   global pid, estado, Estados, process, proc
@@ -187,8 +188,8 @@ def procesar(audioName = 'audio_final.wav'):
     match = re.search("queen|la renga|los redondos|bon jovi",str1)
     if(match):
       band = match.group()
-    #listar(band)
-    msg="Listando canciones de " + str(band)
+    msg = listar(band)
+    #msg="Listando canciones de " + str(band)
   else:
     print("No reconoce comando...")
     msg = "No reconoce comando"
