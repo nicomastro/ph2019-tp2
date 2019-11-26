@@ -2,12 +2,28 @@
 
 ## Dominio del TP:
 
-Para el TP pensamos hacer un sistema al cual le podemos dar una instrucción para que reproduzca una canción dada por nombre o que reproduzca alguna dada por grupo/cantante.
-La idea sería tener una especie de base de datos con nombre de canción y grupo/cantante.
+El reconocedor de habla que implementamos está pensado con la intención de ser un "asistente" especializado en la reproducción y control de una biblioteca de archivos de audios, como canciones. 
 
-El usuario puede decir algo como "Reproducir canción X" o "Reproducir canciones de Y". Si no encuentra ninguna, informa que no tiene "esa canción X o ese grupo Y". Si encuentra va a responder algo como "Reproduciendo canción X" o "Reproduciendo canciones de Y". En cualquier momento se le puede indicar al sistema que pause la canción.
+### Funcionalidades Implementadas:
 
-Como funcionalidades adicionales a explorar, se podría pensar en comandos para listar canciones, comandos para alterar la forma de reproducción (pasar a la próxima/anterior, reproducir aleatorio), controlar volumen, cambiar velocidad de reproducción, etc.
+### Reproducir:
+Para interactuar con el sistema, el usuario pronunciará comandos hablados sencillos como "reproducir canción de X" o "reproducir canciones de Y".
+Para el segundo caso, se elige alguna canción de la banda Y para reproducir en caso de haber más de una. En cualquier caso se le informará al usuario a través de un audio con voz sintetizada, el resultado de su orden.
+
+### Pausar:
+
+A su vez, en cualquier momento se le puede indicar al sistema que pause la canción o que la reanude.
+Actualmente, el sistema es bastante restrictivo y son pocas las variantes de las directivas que puede comprender. Se hablará de esto en la sección correspondiente a la arquitectura.
+
+### Listar:
+
+En caso de querer conocer ciertas canciones disponibles en la biblioteca, se podrá pedir que el sistema sintetice las lista de canciones de una determinada banda para que luego el usuario pueda elegir cual reproducir. En prinicipio, se enunciaran todas pero la intención es que, a futuro, solo se presente una cantidad muy restringida y que el usuario decida si quiere continuar escuchando la lista, recibiendo prompts cada vez más cortos.
+
+
+### A futuro:
+
+Como funcionalidades adicionales a explorar, se podría pensar en comandos para alterar la forma de reproducción (pasar a la próxima/anterior, reproducir aleatorio), controlar volumen, cambiar velocidad de reproducción, etc.
+
 
 
 ## Arquitectura del SDH:
