@@ -85,6 +85,12 @@ def resToString(res):
   else:
     return ''
 
+def resample(rate,file):
+  tfm = sox.Transformer()
+  tfm.convert(samplerate=rate, n_channels=1,bitdepth=16)
+  tfm.build(file+".wav", file+"_final.wav")
+  return
+ 
 def listar(band_filter=None):
   print(band_filter)
   df = pd.read_csv('canciones/songs.csv',header = 0)
@@ -112,11 +118,11 @@ def procesar(audioName = 'audio_final.wav'):
   print(str1)
   msg = ""
   song=""
-  
+  encontro = False
   if (re.search("poner|reproducir|poné", str1)):
     encontro = True
     msg="Reproduciendo"
-    if re.search("algo de|canción de",str1):
+    if re.search("algo de|canción de|canciones de|un tema de|temas de",str1):
       msg=msg + " algo de"
       if re.search("la renga|los redondos|épica|queen|bon jovi",str1):
         print("Reproduciendo...")
@@ -136,7 +142,7 @@ def procesar(audioName = 'audio_final.wav'):
         estado = Estados.Reproduciendo
       else:
         encontro = False
-    elif re.search("la bestia pop|el revelde | you give love a bad name",str1):
+    elif re.search("la bestia pop|el revelde|you give love a bad name",str1):
       print("Reproduciendo...")
       if re.search("la bestia pop",str1):
         msg = msg + " la bestia pop"
@@ -150,22 +156,7 @@ def procesar(audioName = 'audio_final.wav'):
       encontro = False
 
     if encontro == True:
-      #pid = os.fork()
-      #if(pid == 0):
-      if process != None:
-        process.terminate()
-        #process.close()
-      process = Process(target=play_wav, args=('canciones/'+song, 1024))
-      process.start()
-      pid = process.pid
-      proc = psutil.Process(pid)
-
       print("Encontró:")
-      #msg = "Reproduciendo"
-        #play_wav('data/songs/el_revelde.wav')
-        #os._exit(os.EX_OK)
-      #else:
-      #  print(pid)
     else:
       print("No Encontró:")
       msg = "No se encontró lo buscado"
@@ -191,6 +182,13 @@ def procesar(audioName = 'audio_final.wav'):
     else:
       print("No se puede reanudar porque no está pausado...")
       msg = "No se puede reanudar porque no está pausado"
+  elif( re.search("listar|listá",str1)):
+    band = None
+    match = re.search("queen|la renga|los redondos|bon jovi",str1)
+    if(match):
+      band = match.group()
+    #listar(band)
+    msg="Listando canciones de " + str(band)
   else:
     print("No reconoce comando...")
     msg = "No reconoce comando"
@@ -202,6 +200,15 @@ def procesar(audioName = 'audio_final.wav'):
   #process = Process(target=play_wav, args=('tmp/salida.wav'))
   #process.start()
   play_wav('tmp/salida.wav')
+  
+  if encontro == True:
+    if process != None:
+        process.terminate()
+    if len(song) > 0:
+        process = Process(target=play_wav, args=('canciones/'+song, 1024))
+        process.start()
+        pid = process.pid
+        proc = psutil.Process(pid)
   return
 
 def on_click(x, y, button, pressed):

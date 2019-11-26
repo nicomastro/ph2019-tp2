@@ -5,7 +5,7 @@ public <grammar> = (<cmd_reproduccion> <item>  | <cmd_reproduccion> <cancion> | 
 
 <cmd_reproduccion> = (reproducir | poner | poné);
 <cmd_control> = (pausar | detener | reanudar | continuar | aumentar volumen | bajar volumen);
-<item> = (canción de <banda> |  canciones de <banda> | algo de <banda> | <NULL> );
+<item> = (canción de <banda> |  canciones de <banda> | algo de <banda> | un tema de <banda> | temas de <banda> | <NULL> );
 <cancion> = (el revelde | la bestia pop | you give love a bad name);
 <banda> = (la renga | los redondos | queen | épica | bon jovi);
 
