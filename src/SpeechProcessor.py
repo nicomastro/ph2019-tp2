@@ -29,19 +29,20 @@ class SpeechProcessor:
         self.ps.set_search('tp2')
 
         # Síntesis
-        self.tts_authenticator = IAMAuthenticator('16brHHpIvclEZodkhLMGcoq4FKN7_dTh601Gh9HauYRH')
+        self.tts_authenticator = IAMAuthenticator('avYYGN5-aWqijOa1l-ftrUjX20KTE5tLZg1riiy-5HDX')
         self.tts = TextToSpeechV1(authenticator=self.tts_authenticator)
         self.tts.set_service_url('https://stream.watsonplatform.net/text-to-speech/api')
 
 
     def sintetizar(self, outFileName, msg):
-        with open(outFileName, 'wb') as audio_file:
-            audio_file.write(
-                self.tts.synthesize(
-                    msg,
-                    voice='es-LA_SofiaV3Voice',
-                    accept='audio/wav'
-                ).get_result().content)
+        if len(msg) > 0:
+            with open(outFileName, 'wb') as audio_file:
+                audio_file.write(
+                    self.tts.synthesize(
+                        msg,
+                        voice='es-LA_SofiaV3Voice',
+                        accept='audio/wav'
+                    ).get_result().content)
 
     def reconocer(self, inFileName='audio.wav'):
         # Reconocimiento
