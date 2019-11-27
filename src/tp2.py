@@ -101,9 +101,9 @@ def listar():
   msg = ""
   if(band != ""):
     df = df[df['artist'] == band] 
-    item = "canciones de "
+    item = "canciones de " + str(df.iloc[0,2])
   if(not(listando)):
-    msg = "Se encontraron" + str(df.shape[0]) + item + band + ". Algunas de ellas son:"
+    msg = "Se encontraron" + str(df.shape[0]) + item + ". Algunas de ellas son:"
   
   msg += df.iloc[listando:listando+2].to_string(index=False,index_names=False,header=False,columns=['song'])
   listando += 2
@@ -119,8 +119,40 @@ def listar():
   print(msg)
   return msg
 
+def pausar():
+  global estado, Estados, process, proc
+  msg = ""
+  if estado == Estados.Reproduciendo:
+    print("Pausando...")
+    msg = "Pausado"
+    estado = Estados.Pausado
+    if process != None:
+      proc.suspend()
+      #os.kill(pid, signal.SIGSTOP)
+  else:
+    print("No se puede pausar porque no está reproduciendo...")
+    msg = "No se puede pausar porque no está reproduciendo"
+
+  return msg
+
+def continuar():
+  global estado, Estados, process, proc
+  msg = ""
+  if estado == Estados.Pausado:
+    print("Reanudando...")
+    #msg = "Reanudando"
+    estado = Estados.Reproduciendo
+    if process != None:
+      proc.resume()
+    #os.kill(pid, signal.SIGCONT)
+  else:
+    print("No se puede reanudar porque no está pausado...")
+    #msg = "No se puede reanudar porque no está pausado"
+    
+  return msg
+
 def procesar(audioName = 'audio_final.wav'):
-  global pid, estado, Estados, process, proc
+  global pid, estado, Estados, process, proc, listando, band
   cmd, res = sp.reconocer(audioName)
   #str1 = ''.join(res)
 
@@ -132,11 +164,12 @@ def procesar(audioName = 'audio_final.wav'):
   song=""
   encontro = False
   if (re.search("poner|reproducir|poné", str1)):
-    encontro = True
-    msg="Reproduciendo"
+    #msg="Reproduciendo"
     if re.search("algo de|canción de|canciones de|un tema de|temas de",str1):
-      msg=msg + " algo de"
+      msg="Reproduciendo"
+      msg=msg + " algo de "
       if re.search("la renga|los redondos|épica|queen|bon jovi",str1):
+        encontro = True
         print("Reproduciendo...")
         if re.search("la renga",str1):
             msg = msg + " la renga"
@@ -153,51 +186,35 @@ def procesar(audioName = 'audio_final.wav'):
             song="Under_Pressure.wav"
         estado = Estados.Reproduciendo
       else:
+        msg="Especifique banda"
         encontro = False
-    elif re.search("la bestia pop|el revelde|you give love a bad name",str1):
-      print("Reproduciendo...")
-      if re.search("la bestia pop",str1):
-        msg = msg + " la bestia pop"
-      elif re.search("you give love a bad name",str1):
-        msg = msg + " iu guiv lov e bad neim"
-        song="You_give_love_a_bad_name.wav"
+    else:
+      match = re.search("la bestia pop|el revelde|you give love a bad name",str1)
+      if(match != None):
+        print(match)
+        encontro = True
+        aux = match.group(0)
+        print("Reproduciendo...")
+        if aux == "you give love a bad name":
+          #msg = msg + " iu guiv lov e bad neim"
+          song="You_give_love_a_bad_name.wav"
+#        elif aux == "cry for the moon":
+#          song="Cry_for_the_Moon.wav"
+        else:
+          msg = msg + match.group(0)
+        estado = Estados.Reproduciendo
       else:
-        msg = msg + " el revelde"
-      estado = Estados.Reproduciendo
-    else:
-      encontro = False
-
-    if encontro == True:
-      print("Encontró:")
-    else:
-      print("No Encontró:")
-      msg = "No se encontró lo buscado"
+        msg = "Lo sentimos, nuestro sitema se encuentra en construcción. Pruebe otra canción o listar"
+        encontro = False
   elif re.search("detener|pausar", str1):
-    if estado == Estados.Reproduciendo:
-      print("Pausando...")
-      msg = "Pausando"
-      estado = Estados.Pausado
-      if process != None:
-        proc.suspend()
-      #os.kill(pid, signal.SIGSTOP)
-    else:
-      print("No se puede pausar porque no está reproduciendo...")
-      msg = "No se puede pausar porque no está reproduciendo"
+    msg = pausar()
   elif (re.search("continuar|reanudar",str1)):
-    if estado == Estados.Pausado:
-      print("Reanudando...")
-      msg = "Reanudando"
-      estado = Estados.Reproduciendo
-      if process != None:
-        proc.resume()
-      #os.kill(pid, signal.SIGCONT)
-    else:
-      print("No se puede reanudar porque no está pausado...")
-      msg = "No se puede reanudar porque no está pausado"
+    continuar()
   elif( re.search("listar|listá",str1)):
-    match = re.search("queen|la renga|los redondos|bon jovi",str1)
+    pausar()
+    match = re.search("queen|la renga|los redondos|bon jovi|épica",str1)
     if(match):
-      band = match[0]
+      band = match.group(0)
     msg = listar()
   elif(re.search("si",str1) and listando):
     msg = listar()
@@ -207,15 +224,7 @@ def procesar(audioName = 'audio_final.wav'):
     msg = "¡Entendido!"
   else:
     print("No reconoce comando...")
-    msg = "No reconoce comando"
-
-  sp.sintetizar('tmp/salida.wav',msg)
-  #if process != None:
-  #  process.terminate()
-  #  process.close()
-  #process = Process(target=play_wav, args=('tmp/salida.wav'))
-  #process.start()
-  play_wav('tmp/salida.wav')
+    msg = "No reconoce comando. Pruebe listar, y luego, reproducir alguna de la lista."
   
   if encontro == True:
     if process != None:
@@ -225,6 +234,17 @@ def procesar(audioName = 'audio_final.wav'):
         process.start()
         pid = process.pid
         proc = psutil.Process(pid)
+    else:
+        sp.sintetizar('tmp/salida.wav',msg)
+        play_wav('tmp/salida.wav')
+  else:
+    if len(msg) > 0:
+        if estado==Estados.Reproduciendo:
+            pausar()
+        sp.sintetizar('tmp/salida.wav',msg)
+        play_wav('tmp/salida.wav')
+        #if estado == Estados.Pausado:
+        #    continuar()
   return
 
 def on_click(x, y, button, pressed):
