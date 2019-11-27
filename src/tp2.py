@@ -98,7 +98,7 @@ def listar(band_filter=None):
   msg = "Canciones "
   if(band_filter):
     df = df[df['artist'] == band_filter] 
-    msg+= "de " + band_filter 
+    msg+= "de " + str(df.iloc[0,2])
   msg +=  " ... \n" + df.to_string(index=False,index_names=False,header=False,columns=['song'])
   #sp.sintetizar('tmp/salida.wav',msg)
   #resample(48000,'tmp/salida')  
@@ -185,7 +185,7 @@ def procesar(audioName = 'audio_final.wav'):
       msg = "No se puede reanudar porque no está pausado"
   elif( re.search("listar|listá",str1)):
     band = None
-    match = re.search("queen|la renga|los redondos|bon jovi",str1)
+    match = re.search("queen|la renga|los redondos|bon jovi|épica",str1)
     if(match):
       band = match.group()
     msg = listar(band)
