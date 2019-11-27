@@ -25,6 +25,8 @@ numwav = 0
 pid = -1
 process=None
 proc=None
+listando = 0
+band = ""
 
 class Estados(Enum):
   Escuchando = 0
@@ -90,24 +92,41 @@ def resample(rate,file):
   tfm.build(file+".wav", file+"_final.wav")
   return
 
-def listar(band_filter=None):
-  print(band_filter)
+def listar():
+  global listando, band
+
   df = pd.read_csv('canciones/songs.csv',header = 0)
-  msg = "Canciones "
-  if(band_filter):
-    df = df[df['artist'] == band_filter] 
-    msg+= "de " + band_filter 
-  msg +=  " ... \n" + df.to_string(index=False,index_names=False,header=False,columns=['song'])
-  sp.sintetizar('tmp/salida.wav',msg)
-  resample(48000,'tmp/salida')  
-  play_wav('tmp/salida_final.wav')
-
+  item = ""
+  msg = ""
+  if(band != ""):
+    df = df[df['artist'] == band] 
+    item = "canciones de "
+  if(not(listando)):
+    msg = "Se encontraron" + str(df.shape[0]) + item + band + ". Algunas de ellas son:"
+  
+  msg += df.iloc[listando:listando+2].to_string(index=False,index_names=False,header=False,columns=['song'])
+  listando += 2
+  if(listando< df.shape[0]):
+    if(listando==2):
+      msg+= ". ¿Desea continuar listando más canciones?"
+    else:
+      msg+=". ¿Sigo?"
+  else:
+    listando = 0
+    band = ""
+  
   print(msg)
+  return msg
+  #sp.sintetizar('tmp/salida.wav',msg)
+  #resample(48000,'tmp/salida')  
+  #play_wav('tmp/salida_final.wav')
 
+  
   return
 
 def procesar(audioName = 'audio_final.wav'):
-  global pid, estado, Estados, process, proc
+  global pid, estado, Estados, process, proc, listando, band
+
   msg = ""
   song=""
   cmd, res = sp.reconocer(audioName)
@@ -117,7 +136,7 @@ def procesar(audioName = 'audio_final.wav'):
   if (re.search("poner|reproducir|poné", str1)):
     encontro = True
     msg="Reproduciendo"
-    if re.search("algo de|canción de",str1):
+    if re.search("algo de|canción de|un tema de|temas de",str1):
       msg=msg + " algo de"
       if re.search("la renga|los redondos|épica|queen|bon jovi",str1):
         print("Reproduciendo...")
@@ -184,16 +203,22 @@ def procesar(audioName = 'audio_final.wav'):
       print("No se puede reanudar porque no está pausado...")
       msg = "No se puede reanudar porque no está pausado"
   elif( re.search("listar|listá",str1)):
-    band = None
     match = re.search("queen|la renga|los redondos|bon jovi",str1)
     if(match):
       band = match[0]
-    listar(band)
+    msg = listar()
+  elif(re.search("si",str1) and listando):
+    msg = listar()
+  elif(re.search("no",str1) and listando):
+    band = ""
+    listando = 0
+    msg = "¡Entendido!"
   else:
-    print("No reconoce comando...")
-    msg = "No reconoce comando"
+    print("No reconozco el  comando...")
+    msg = "No reconozco el  comando"
 
   print(msg)
+  
   sp.sintetizar('tmp/salida.wav',msg)
   resample(48000,'tmp/salida')  
   play_wav('tmp/salida_final.wav')
