@@ -29,7 +29,7 @@ class SpeechProcessor:
         self.ps.set_search('tp2')
 
         # Síntesis
-        self.tts_authenticator = IAMAuthenticator('avYYGN5-aWqijOa1l-ftrUjX20KTE5tLZg1riiy-5HDX')
+        self.tts_authenticator = IAMAuthenticator('cq9_4YcCXxClw2AfgUhbokFktZ-xSRT4kcHS2akcZ05J')
         self.tts = TextToSpeechV1(authenticator=self.tts_authenticator)
         self.tts.set_service_url('https://stream.watsonplatform.net/text-to-speech/api')
 

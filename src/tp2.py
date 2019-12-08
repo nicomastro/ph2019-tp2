@@ -17,6 +17,7 @@ from enum import Enum
 from sox import core
 from sox.core import SoxiError
 from SpeechProcessor import SpeechProcessor
+import alsaaudio
 
 sp=SpeechProcessor()
 recfile = None
