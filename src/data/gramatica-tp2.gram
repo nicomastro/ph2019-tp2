@@ -1,11 +1,12 @@
 #JSGF V1.0;
 grammar tp2;
 
-public <grammar> = (<cmd_reproduccion> <item>  | <cmd_reproduccion> <cancion> | <cmd_control> | listar <item> | listá <item> | <rta>);
-<rta> = (si | no);
+public <grammar> = (<cmd_reproduccion> <item> | <cmd_reproduccion> <cancion> | <cmd_control> | <rta>);
+<rta> = (si | no | terminar);
 <cmd_reproduccion> = (reproducir | poner | poné);
-<cmd_control> = (pausar | detener | reanudar | continuar | subir | aumentar volumen | subir volumen | bajar volumen | bajar );
-<item> = (canción de <banda> |  canciones de <banda> | algo de <banda> | un tema de <banda> | temas de <banda> | <NULL> );
-<cancion> = (el revelde | la bestia pop | you give love a bad name);
+<cmd_control> = (próxima canción| próxima | siguiente | anterior canción | previa canción | anterior| previa| agregar <cancion> | armar playlist | crear playlist | listar <item> | listá <item> | pausar | detener | reanudar | continuar | subir | aumentar volumen | subir volumen | bajar volumen | bajar );
+
+<item> = (playlist| canción de <banda> |  canciones de <banda> | algo de <banda> | un tema de <banda> | temas de <banda> | <NULL> );
+<cancion> = (el revelde | la bestia pop | you give love a bad name| under pressure);
 <banda> = (la renga | los redondos | queen | épica | bon jovi);
 
